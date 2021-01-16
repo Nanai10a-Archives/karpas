@@ -16,6 +16,7 @@ impl Karpas {
             .add_plugins(DefaultPlugins)
             .init_resource::<ButtonMaterials>()
             .add_startup_system(setup.system())
+            .add_startup_system(window_setup.system())
             .add_system(button_system.system())
             .add_system(moving.system())
             .run();
@@ -127,4 +128,13 @@ fn moving(
     for (_, mut transform) in query.iter_mut() {
         transform.translation.x = transform.translation.x + (time.delta_seconds() * 100.0)
     }
+}
+
+
+fn window_setup(
+    mut windows: ResMut<Windows>,
+) {
+    let window = windows.get_primary_mut().unwrap();
+    window.set_vsync(true);
+    window.set_title("Karpas, so yummy.".to_string());
 }
