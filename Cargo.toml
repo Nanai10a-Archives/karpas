@@ -1,5 +1,5 @@
 [package]
-name = "Karpas"
+name = "karpas"
 version = "0.1.0"
 authors = ["Nanai10a <Nanai10a@tutanota.com>"]
 edition = "2018"
