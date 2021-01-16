@@ -1,9 +1,5 @@
 use karpas::boot::*;
 
 fn main() {
-    KarpasBuilder
-        .build()
-        .unwrap()
-        .boot()
-        .unwrap()
+    KarpasBuilder.build().unwrap().boot().unwrap()
 }

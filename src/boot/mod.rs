@@ -114,26 +114,18 @@ fn setup(
             material: color_materials.add(asset_server.load("mino.png").into()),
             ..Default::default()
         })
-        .with(
-            Mino
-        );
+        .with(Mino);
 }
 
 struct Mino;
 
-fn moving(
-    time: Res<Time>,
-    mut query: Query<(&Mino, &mut Transform)>,
-) {
+fn moving(time: Res<Time>, mut query: Query<(&Mino, &mut Transform)>) {
     for (_, mut transform) in query.iter_mut() {
         transform.translation.x = transform.translation.x + (time.delta_seconds() * 100.0)
     }
 }
 
-
-fn window_setup(
-    mut windows: ResMut<Windows>,
-) {
+fn window_setup(mut windows: ResMut<Windows>) {
     let window = windows.get_primary_mut().unwrap();
     window.set_vsync(true);
     window.set_title("Karpas, so yummy.".to_string());
