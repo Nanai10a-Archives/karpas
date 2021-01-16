@@ -1,3 +1,5 @@
+extern crate karpas;
+
 use bevy::prelude::*;
 
 fn main() {
