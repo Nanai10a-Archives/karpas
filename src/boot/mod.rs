@@ -79,7 +79,7 @@ fn setup(
                 size: Size::new(Val::Px(150.0), Val::Px(65.0)),
                 margin: Rect::all(Val::Auto),
                 justify_content: JustifyContent::Center,
-                align_content: AlignContent::Center,
+                align_items: AlignItems::Center,
                 ..Default::default()
             },
             material: button_materials.normal.clone(),
