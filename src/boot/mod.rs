@@ -17,6 +17,7 @@ impl Karpas {
             .init_resource::<ButtonMaterials>()
             .add_startup_system(setup.system())
             .add_system(button_system.system())
+            .add_system(moving.system())
             .run();
 
         return Ok(());
@@ -72,8 +73,10 @@ fn setup(
     commands: &mut Commands,
     asset_server: Res<AssetServer>,
     button_materials: Res<ButtonMaterials>,
+    mut color_materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands.spawn(CameraUiBundle::default())
+    commands
+        .spawn(CameraUiBundle::default())
         .spawn(ButtonBundle {
             style: Style {
                 size: Size::new(Val::Px(150.0), Val::Px(65.0)),
@@ -99,4 +102,29 @@ fn setup(
                 ..Default::default()
             });
         });
+
+    commands
+        .spawn(Camera2dBundle::default())
+        .spawn(SpriteBundle {
+            transform: Transform {
+                translation: Vec3::new(0.0, 0.0, 0.0),
+                ..Default::default()
+            },
+            material: color_materials.add(asset_server.load("mino.png").into()),
+            ..Default::default()
+        })
+        .with(
+            Mino
+        );
+}
+
+struct Mino;
+
+fn moving(
+    time: Res<Time>,
+    mut query: Query<(&Mino, &mut Transform)>,
+) {
+    for (_, mut transform) in query.iter_mut() {
+        transform.translation.x = transform.translation.x + (time.delta_seconds() * 100.0)
+    }
 }
