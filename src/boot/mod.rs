@@ -549,22 +549,22 @@ impl Tetriminos {
             core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
-                color: Color::BLUE,
+                color: Color::PURPLE,
                 pos: (init_x.clone(), init_y.clone()),
                 sprite: Default::default(),
             },
             sub1: Block {
-                color: Color::BLUE,
+                color: Color::PURPLE,
                 pos: (init_x.clone() - 1, init_y.clone() - 1),
                 sprite: Default::default(),
             },
             sub2: Block {
-                color: Color::BLUE,
+                color: Color::PURPLE,
                 pos: (init_x.clone(), init_y.clone()),
                 sprite: Default::default(),
             },
             sub3: Block {
-                color: Color::BLUE,
+                color: Color::PURPLE,
                 pos: (init_x.clone() + 1, init_y.clone() - 1),
                 sprite: Default::default(),
             },
