@@ -120,7 +120,6 @@ fn wall_setup(
         let y_wall_translation = (height / 2.0) + wall_offset;
 
         commands
-            .spawn(Camera2dBundle::default())
             .spawn(SpriteBundle {
                 material: wall_material.clone(),
                 transform: Transform::from_translation(Vec3::new(x_wall_translation, 0.0, 0.0)),
@@ -149,35 +148,49 @@ fn ui_setup(
     texture_server: Res<TextureHandlerServer>,
     mut color_materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    commands
-        .spawn(CameraUiBundle::default())
-        .spawn(ButtonBundle {
-            style: Style {
-                size: Size::new(Val::Px(150.0), Val::Px(65.0)),
-                margin: Rect::all(Val::Auto),
-                justify_content: JustifyContent::Center,
-                align_items: AlignItems::Center,
-                ..Default::default()
-            },
-            material: button_materials.normal.clone(),
+    commands.spawn(CameraUiBundle::default());
+
+    commands.spawn(NodeBundle {
+        style: Style {
+            // 自身を中央に配置する
+            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+            position_type: PositionType::Absolute,
+
+            // 子要素群を縦横中央に配置する
+            align_items: AlignItems::Center,
+            justify_content: JustifyContent::Center,
+
+            // 子要素(Flex)を順にy軸負の方向から並べていく
+            // Tips: x軸はブラウザとは変わらないがy軸は下向きが正の向きだぞ!
+            flex_direction: FlexDirection::ColumnReverse,
             ..Default::default()
-        })
-        .with_children(|child_builder| {
-            child_builder.spawn(TextBundle {
-                text: Text {
-                    value: "Button".to_string(),
-                    font: asset_server.load("fonts.ttf"),
-                    style: TextStyle {
-                        font_size: 40.0,
-                        color: Color::rgb(0.9, 0.9, 0.9),
-                        ..Default::default()
-                    },
+        },
+        material: color_materials.add(Color::CYAN.into()),
+        ..Default::default()
+    })
+        .with_children(|parent| {
+            parent.spawn(NodeBundle {
+                style: Style {
+                    size: Size::new(Val::Px(100.0), Val::Px(100.0)),
+                    margin: Rect::all(Val::Px(100.0)),
+                    ..Default::default()
+                },
+                material: color_materials.add(Color::PURPLE.into()),
+                ..Default::default()
+            }).spawn(NodeBundle {
+                style: Style {
+                    size: Size::new(Val::Px(100.0), Val::Px(100.0)),
+                    margin: Rect::all(Val::Px(100.0)),
+                    ..Default::default()
                 },
                 ..Default::default()
             });
         });
 
+
+
     commands
+        .spawn(Camera2dBundle::default())
         .spawn(SpriteBundle {
             transform: Transform {
                 translation: Vec3::new(GRID_SIZE / 2.0, GRID_SIZE / 2.0, 0.0),
