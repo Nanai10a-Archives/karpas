@@ -152,7 +152,7 @@ fn movement_system(
             x_direction += BLOCK_SIZE;
         }
 
-        let mut y_direction = BLOCK_SIZE;
+        let mut y_direction = 0.0;
 
         if key_input.just_pressed(KeyCode::Up) {
             y_direction += BLOCK_SIZE;
