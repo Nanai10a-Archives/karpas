@@ -396,7 +396,7 @@ impl Tetriminos {
             },
             sub2: Block {
                 color: Color::GREEN,
-                pos: (init.clone() + 1, init_y.clone()),
+                pos: (init_x.clone() + 1, init_y.clone()),
                 sprite: Default::default(),
             },
             sub3: Block {
@@ -489,7 +489,7 @@ impl Tetriminos {
         });
     }
 
-    fn new_l(core_x: isize, core_y: isize) -> Tetriminos {
+    fn new_l(init_x: isize, init_y: isize) -> Tetriminos {
         return Tetriminos::L(Tetrimino {
             /*
                init -> x
@@ -530,7 +530,7 @@ impl Tetriminos {
         });
     }
 
-    fn new_t(core_x: isize, core_y: isize) -> Tetriminos {
+    fn new_t(init_x: isize, init_y: isize) -> Tetriminos {
         return Tetriminos::T(Tetrimino {
             /*
                init(2) -> x
