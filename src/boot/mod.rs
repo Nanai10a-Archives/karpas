@@ -23,6 +23,9 @@ impl Karpas {
             .add_startup_system(load_texture.system())
             .add_startup_system(setup.system())
             .add_startup_system(window_setup.system())
+            .add_resource(GridColumns(10, 20))
+            .add_startup_system(grid_setup.system())
+            .add_startup_system(wall_setup.system())
             .add_system(button_system.system())
             .add_system(movement_system.system())
             .run();
@@ -76,6 +79,69 @@ fn button_system(
     }
 }
 
+#[derive(Clone)]
+struct GridColumns(i32, i32);
+
+struct Grid(Vec<Vec<Option<Block>>>);
+
+#[derive(Bundle)]
+struct GridBundle {
+    // won't fix FIXME: this is tetris?
+    grid: Grid,
+}
+
+const GRID_SIZE: f32 = 32.0;
+const WALL_THICKNESS: f32 = 10.0;
+
+fn grid_setup(commands: &mut Commands, grid_columns: Res<GridColumns>) {
+    let GridColumns(x_size, y_size) = grid_columns.clone();
+
+    commands.spawn(GridBundle {
+        grid: Grid(vec![vec![None; x_size as usize]; y_size as usize]),
+    });
+}
+
+fn wall_setup(
+    commands: &mut Commands,
+    mut color_materials: ResMut<Assets<ColorMaterial>>,
+    query: Query<&Grid>,
+) {
+    let wall_material = color_materials.add(ColorMaterial::from(Color::GRAY));
+    let wall_offset = WALL_THICKNESS / 2.0;
+
+    query.iter().for_each(|Grid(grid)| {
+        let y_size = grid.len();
+        let x_size = grid[0].len();
+
+        let width = x_size as f32 * GRID_SIZE;
+        let height = y_size as f32 * GRID_SIZE;
+
+        let x_wall_translation = (width / 2.0) + wall_offset;
+        let y_wall_translation = (height / 2.0) + wall_offset;
+
+        commands
+            .spawn(Camera2dBundle::default())
+            .spawn(SpriteBundle {
+                material: wall_material.clone(),
+                transform: Transform::from_translation(Vec3::new(x_wall_translation, 0.0, 0.0)),
+                sprite: Sprite::new(Vec2::new(WALL_THICKNESS, height)),
+                ..Default::default()
+            })
+            .spawn(SpriteBundle {
+                material: wall_material.clone(),
+                transform: Transform::from_translation(Vec3::new(-x_wall_translation, 0.0, 0.0)),
+                sprite: Sprite::new(Vec2::new(WALL_THICKNESS, height)),
+                ..Default::default()
+            })
+            .spawn(SpriteBundle {
+                material: wall_material.clone(),
+                transform: Transform::from_translation(Vec3::new(0.0, -y_wall_translation, 0.0)),
+                sprite: Sprite::new(Vec2::new(width, WALL_THICKNESS)),
+                ..Default::default()
+            });
+    });
+}
+
 fn setup(
     commands: &mut Commands,
     asset_server: Res<AssetServer>,
@@ -112,10 +178,9 @@ fn setup(
         });
 
     commands
-        .spawn(Camera2dBundle::default())
         .spawn(SpriteBundle {
             transform: Transform {
-                translation: Vec3::new(0.0, 0.0, 0.0),
+                translation: Vec3::new(16.0, 16.0, 0.0),
                 ..Default::default()
             },
             material: color_materials.add(ColorMaterial {
@@ -127,15 +192,14 @@ fn setup(
         .with(FocusingTetrimino);
 }
 
+#[derive(Clone)]
 struct Block {
     color: Color,
-    pos: (isize, isize),
 }
 
 const BLOCK_SIZE: f32 = 32.0;
 
 fn movement_system(
-    time: Res<Time>,
     mut query: Query<(&FocusingTetrimino, &mut Transform)>,
     key_input: Res<Input<KeyCode>>,
 ) {
@@ -181,7 +245,6 @@ fn window_setup(mut windows: ResMut<Windows>) {
 fn load_texture(
     asset_server: Res<AssetServer>,
     mut handler_server: ResMut<TextureHandlerServer>,
-    mut textures: ResMut<Assets<Texture>>,
 ) {
     // TODO: 何らかの方式(テキスト)でassetsを管理し, 管理ファイルから読み込もう
     [(1i16, "mino.png")].iter().for_each(|(num, path)| {
