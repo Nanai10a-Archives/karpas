@@ -194,13 +194,10 @@ struct TextureHandlerServer {
     container: HashMap<i16, Handle<Texture>>,
 }
 
+/*
 #[derive(Bundle)]
 struct Tetrimino {
     rotation: TetriminoRotate,
-    core: Block,
-    sub1: Block,
-    sub2: Block,
-    sub3: Block,
 }
 
 impl Tetrimino {
@@ -279,6 +276,10 @@ enum TetriminoRotate {
     LEFT,
     RIGHT,
 }
+
+// 4x4衝突
+// 4x4回転
+// SRS検証
 
 impl Tetriminos {
     fn new_i(init_x: isize, init_y: isize) -> Tetriminos {
@@ -533,5 +534,7 @@ impl Tetriminos {
         });
     }
 }
+
+*/
 
 struct FocusingTetrimino;
