@@ -124,33 +124,33 @@ fn setup(
             }),
             ..Default::default()
         })
-        .with(Mino);
+        .with(Block);
 }
 
-struct Mino;
+struct Block;
 
-const MINO_SIZE: f32 = 32.0;
+const BLOCK_SIZE: f32 = 32.0;
 
 fn movement_system(
     time: Res<Time>,
-    mut query: Query<(&Mino, &mut Transform)>,
+    mut query: Query<(&Block, &mut Transform)>,
     key_input: Res<Input<KeyCode>>,
 ) {
     for (_, mut transform) in query.iter_mut() {
         let mut x_direction = 0.0;
 
         if key_input.just_pressed(KeyCode::Left) {
-            x_direction -= MINO_SIZE;
+            x_direction -= BLOCK_SIZE;
         }
 
         if key_input.just_pressed(KeyCode::Right) {
-            x_direction += MINO_SIZE;
+            x_direction += BLOCK_SIZE;
         }
 
-        let mut y_direction =MINO_SIZE;
+        let mut y_direction = BLOCK_SIZE;
 
         if key_input.just_pressed(KeyCode::Up) {
-            y_direction += MINO_SIZE;
+            y_direction += BLOCK_SIZE;
         }
 
         if key_input.just_pressed(KeyCode::Down) {
