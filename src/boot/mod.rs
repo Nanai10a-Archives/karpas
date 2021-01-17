@@ -26,7 +26,7 @@ impl Karpas {
             .add_resource(GridColumns(10, 20))
             .add_startup_system(grid_setup.system())
             .add_startup_system(wall_setup.system())
-            .add_system(button_system.system())
+            .add_system(start_button_system.system())
             .add_system(movement_system.system())
             .run();
 
@@ -51,7 +51,7 @@ impl FromResources for ButtonMaterials {
     }
 }
 
-fn button_system(
+fn start_button_system(
     button_materials: Res<ButtonMaterials>,
     mut interaction_query: Query<
         (&Interaction, &mut Handle<ColorMaterial>, &Children),
@@ -64,15 +64,15 @@ fn button_system(
 
         match *interaction {
             Interaction::Clicked => {
-                text.value = "Press".to_string().into();
+                text.value = "! Start !".to_string().into();
                 *material = button_materials.pressed.clone();
             }
             Interaction::Hovered => {
-                text.value = "Hover".to_string().into();
+                text.value = "are you Ready?".to_string().into();
                 *material = button_materials.hovered.clone();
             }
             Interaction::None => {
-                text.value = "Button".to_string().into();
+                text.value = "this is START button.".to_string().into();
                 *material = button_materials.normal.clone();
             }
         }
