@@ -123,11 +123,16 @@ fn setup(
                 color: Color::DARK_GREEN,
             }),
             ..Default::default()
-        })
-        .with(Block);
+        });
+    // .with(Block);
 }
 
-struct Block;
+#[derive(Bundle)]
+struct Block {
+    color: Color,
+    pos: (isize, isize),
+    sprite: SpriteBundle,
+}
 
 const BLOCK_SIZE: f32 = 32.0;
 
@@ -189,4 +194,380 @@ fn load_texture(
 
 struct TextureHandlerServer {
     container: HashMap<i16, Handle<Texture>>,
+}
+
+#[derive(Bundle)]
+struct Tetrimino {
+    core_pos: (isize, isize),
+    rotation: TetriminoRotate,
+    core: Block,
+    sub1: Block,
+    sub2: Block,
+    sub3: Block,
+}
+
+impl Tetrimino {
+    fn oneblock_down(&mut self) {
+        // TODO: 衝突処理を作る.
+        unimplemented!();
+    }
+
+    fn rotate(&mut self, direction: RotateDirection) {
+        let direction_is_right = match direction {
+            RotateDirection::RIGHT => true,
+            RotateDirection::LEFT => false,
+        };
+
+        match self.rotation {
+            TetriminoRotate::UP => {
+                self.rotation = if direction_is_right {
+                    TetriminoRotate::RIGHT
+                } else {
+                    TetriminoRotate::LEFT
+                }
+            }
+
+            TetriminoRotate::DOWN => {
+                self.rotation = if direction_is_right {
+                    TetriminoRotate::LEFT
+                } else {
+                    TetriminoRotate::RIGHT
+                }
+            }
+
+            TetriminoRotate::LEFT => {
+                self.rotation = if direction_is_right {
+                    TetriminoRotate::UP
+                } else {
+                    TetriminoRotate::DOWN
+                }
+            }
+
+            TetriminoRotate::RIGHT => {
+                self.rotation = if direction_is_right {
+                    TetriminoRotate::DOWN
+                } else {
+                    TetriminoRotate::UP
+                }
+            }
+        };
+
+        // TODO: 回転処理を作る.
+        unimplemented!();
+    }
+
+    fn on_place(self) -> (Block, Block, Block, Block) {
+        return (self.core, self.sub1, self.sub2, self.sub3);
+    }
+}
+
+enum Tetriminos {
+    I(Tetrimino),
+    O(Tetrimino),
+    S(Tetrimino),
+    Z(Tetrimino),
+    J(Tetrimino),
+    L(Tetrimino),
+    T(Tetrimino),
+}
+
+enum RotateDirection {
+    RIGHT,
+    LEFT,
+}
+
+enum TetriminoRotate {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+}
+
+impl Tetriminos {
+    fn new_i(init_x: isize, init_y: isize) -> Tetriminos {
+        return Tetriminos::I(Tetrimino {
+            /*
+               init -> x
+               core -> c
+               sub -> 1~3
+
+               y: ?
+                  |
+                  0
+
+            x: 0123456789
+               xxxxOoxxxx
+                   x
+                  1o23
+               */
+            core_pos: (init_x.clone(), init_y.clone() - 1),
+            rotation: TetriminoRotate::UP,
+            core: Block {
+                color: Color::ALICE_BLUE,
+                pos: (init_x.clone(), init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+            sub1: Block {
+                color: Color::ALICE_BLUE,
+                pos: (init_x.clone() - 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+            sub2: Block {
+                color: Color::ALICE_BLUE,
+                pos: (init_x.clone() + 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+            sub3: Block {
+                color: Color::ALICE_BLUE,
+                pos: (init_x.clone() + 2, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+        });
+    }
+
+    fn new_o(init_x: isize, init_y: isize) -> Tetriminos {
+        return Tetriminos::O(Tetrimino {
+            /*
+               init(1) -> x
+               core -> c
+               sub -> 1~3
+
+               y: ?
+                  |
+                  0
+
+            x: 0123456789
+               xxxxOoxxxx
+                   x2
+                   c3
+               */
+            core_pos: (init_x.clone(), init_y.clone() - 1),
+            rotation: TetriminoRotate::UP,
+            core: Block {
+                color: Color::YELLOW,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub1: Block {
+                color: Color::YELLOW,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub2: Block {
+                color: Color::YELLOW,
+                pos: (init_x.clone() + 1, init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub3: Block {
+                color: Color::YELLOW,
+                pos: (init_x + 1, init_y - 1),
+                sprite: Default::default(),
+            },
+        });
+    }
+
+    fn new_s(init_x: isize, init_y: isize) -> Tetriminos {
+        return Tetriminos::S(Tetrimino {
+            /*
+               init(sub1) -> x
+               core -> c
+               sub -> 1~3
+
+               y: ?
+                  |
+                  0
+
+            x: 0123456789
+               xxxxOoxxxx
+                   x2
+                  3c
+               */
+            core_pos: (init_x.clone(), init_y.clone() - 1),
+            rotation: TetriminoRotate::UP,
+            core: Block {
+                color: Color::GREEN,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub1: Block {
+                color: Color::GREEN,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub2: Block {
+                color: Color::GREEN,
+                pos: (init.clone() + 1, init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub3: Block {
+                color: Color::GREEN,
+                pos: (init_x.clone() - 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+        });
+    }
+
+    fn new_z(init_x: isize, init_y: isize) -> Tetriminos {
+        return Tetriminos::Z(Tetrimino {
+            /*
+               init(2) -> x
+               core -> c
+               sub -> 1~3
+
+               y: ?
+                  |
+                  0
+
+            x: 0123456789
+               xxxxOoxxxx
+                  1x
+                   c3
+               */
+            core_pos: (init_x.clone(), init_y.clone() - 1),
+            rotation: TetriminoRotate::UP,
+            core: Block {
+                color: Color::RED,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub1: Block {
+                color: Color::RED,
+                pos: (init_x.clone() - 1, init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub2: Block {
+                color: Color::RED,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub3: Block {
+                color: Color::RED,
+                pos: (init_x.clone() + 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+        });
+    }
+
+    fn new_j(init_x: isize, init_y: isize) -> Tetriminos {
+        return Tetriminos::J(Tetrimino {
+            /*
+               init -> x
+               core -> c
+               sub -> 1~3
+
+               y: ?
+                  |
+                  0
+
+            x: 0123456789
+               xxxxOoxxxx
+                  1x
+                  2c3
+               */
+            core_pos: (init_x.clone(), init_y.clone() - 1),
+            rotation: TetriminoRotate::UP,
+            core: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub1: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone() - 1, init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub2: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone() - 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+            sub3: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone() + 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+        });
+    }
+
+    fn new_l(core_x: isize, core_y: isize) -> Tetriminos {
+        return Tetriminos::L(Tetrimino {
+            /*
+               init -> x
+               core -> c
+               sub -> 1~3
+
+               y: ?
+                  |
+                  0
+
+            x: 0123456789
+               xxxxOoxxxx
+                   x1
+                  2c3
+               */
+            core_pos: (init_x.clone(), init_y.clone() - 1),
+            rotation: TetriminoRotate::UP,
+            core: Block {
+                color: Color::ORANGE,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub1: Block {
+                color: Color::ORANGE,
+                pos: (init_x.clone() + 1, init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub2: Block {
+                color: Color::ORANGE,
+                pos: (init_x.clone() - 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+            sub3: Block {
+                color: Color::ORANGE,
+                pos: (init_x.clone() + 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+        });
+    }
+
+    fn new_t(core_x: isize, core_y: isize) -> Tetriminos {
+        return Tetriminos::T(Tetrimino {
+            /*
+               init(2) -> x
+               core -> c
+               sub -> 1~3
+
+               y: ?
+                  |
+                  0
+
+            x: 0123456789
+               xxxxOoxxxx
+                   x
+                  1c3
+               */
+            core_pos: (init_x.clone(), init_y.clone() - 1),
+            rotation: TetriminoRotate::UP,
+            core: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub1: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone() - 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+            sub2: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone(), init_y.clone()),
+                sprite: Default::default(),
+            },
+            sub3: Block {
+                color: Color::BLUE,
+                pos: (init_x.clone() + 1, init_y.clone() - 1),
+                sprite: Default::default(),
+            },
+        });
+    }
 }
