@@ -21,7 +21,7 @@ impl Karpas {
                 container: HashMap::new(),
             })
             .add_startup_system(load_texture.system())
-            .add_startup_system(setup.system())
+            .add_startup_system(ui_setup.system())
             .add_startup_system(window_setup.system())
             .add_resource(GridColumns(10, 20))
             .add_startup_system(grid_setup.system())
@@ -142,7 +142,7 @@ fn wall_setup(
     });
 }
 
-fn setup(
+fn ui_setup(
     commands: &mut Commands,
     asset_server: Res<AssetServer>,
     button_materials: Res<ButtonMaterials>,
@@ -162,8 +162,8 @@ fn setup(
             material: button_materials.normal.clone(),
             ..Default::default()
         })
-        .with_children(|parent| {
-            parent.spawn(TextBundle {
+        .with_children(|child_builder| {
+            child_builder.spawn(TextBundle {
                 text: Text {
                     value: "Button".to_string(),
                     font: asset_server.load("fonts.ttf"),
@@ -180,7 +180,7 @@ fn setup(
     commands
         .spawn(SpriteBundle {
             transform: Transform {
-                translation: Vec3::new(16.0, 16.0, 0.0),
+                translation: Vec3::new(GRID_SIZE / 2.0, GRID_SIZE / 2.0, 0.0),
                 ..Default::default()
             },
             material: color_materials.add(ColorMaterial {
@@ -203,6 +203,7 @@ fn movement_system(
     mut query: Query<(&FocusingTetrimino, &mut Transform)>,
     key_input: Res<Input<KeyCode>>,
 ) {
+    // TODO: Event駆動に書き直して, Keyからワンクッション置いて"OnUpButtonPressed"とかしよう
     for (_, mut transform) in query.iter_mut() {
         let mut x_direction = 0.0;
 
@@ -242,10 +243,7 @@ fn window_setup(mut windows: ResMut<Windows>) {
     window.set_title("Karpas, so yummy.".to_string());
 }
 
-fn load_texture(
-    asset_server: Res<AssetServer>,
-    mut handler_server: ResMut<TextureHandlerServer>,
-) {
+fn load_texture(asset_server: Res<AssetServer>, mut handler_server: ResMut<TextureHandlerServer>) {
     // TODO: 何らかの方式(テキスト)でassetsを管理し, 管理ファイルから読み込もう
     [(1i16, "mino.png")].iter().for_each(|(num, path)| {
         let texture = asset_server.load(*path);
@@ -256,348 +254,5 @@ fn load_texture(
 struct TextureHandlerServer {
     container: HashMap<i16, Handle<Texture>>,
 }
-
-/*
-#[derive(Bundle)]
-struct Tetrimino {
-    rotation: TetriminoRotate,
-}
-
-impl Tetrimino {
-    fn oneblock_down(&mut self) {
-        // TODO: 衝突処理を作る.
-        unimplemented!();
-    }
-
-    fn rotate(&mut self, direction: RotateDirection) {
-        let direction_is_right = match direction {
-            RotateDirection::RIGHT => true,
-            RotateDirection::LEFT => false,
-        };
-
-        match self.rotation {
-            TetriminoRotate::UP => {
-                self.rotation = if direction_is_right {
-                    TetriminoRotate::RIGHT
-                } else {
-                    TetriminoRotate::LEFT
-                }
-            }
-
-            TetriminoRotate::DOWN => {
-                self.rotation = if direction_is_right {
-                    TetriminoRotate::LEFT
-                } else {
-                    TetriminoRotate::RIGHT
-                }
-            }
-
-            TetriminoRotate::LEFT => {
-                self.rotation = if direction_is_right {
-                    TetriminoRotate::UP
-                } else {
-                    TetriminoRotate::DOWN
-                }
-            }
-
-            TetriminoRotate::RIGHT => {
-                self.rotation = if direction_is_right {
-                    TetriminoRotate::DOWN
-                } else {
-                    TetriminoRotate::UP
-                }
-            }
-        };
-
-        // TODO: 回転処理を作る.
-        unimplemented!();
-    }
-
-    fn on_place(self) -> (Block, Block, Block, Block) {
-        return (self.core, self.sub1, self.sub2, self.sub3);
-    }
-}
-
-enum Tetriminos {
-    I(Tetrimino),
-    O(Tetrimino),
-    S(Tetrimino),
-    Z(Tetrimino),
-    J(Tetrimino),
-    L(Tetrimino),
-    T(Tetrimino),
-}
-
-enum RotateDirection {
-    RIGHT,
-    LEFT,
-}
-
-enum TetriminoRotate {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-}
-
-// 4x4衝突
-// 4x4回転
-// SRS検証
-
-impl Tetriminos {
-    fn new_i(init_x: isize, init_y: isize) -> Tetriminos {
-        return Tetriminos::I(Tetrimino {
-            /*
-               init -> x
-               core -> c
-               sub -> 1~3
-
-               y: ?
-                  |
-                  0
-
-            x: 0123456789
-               xxxxOoxxxx
-                   x
-                  1o23
-               */
-            rotation: TetriminoRotate::UP,
-            core: Block {
-                color: Color::ALICE_BLUE,
-                pos: (init_x.clone(), init_y.clone() - 1),
-            },
-            sub1: Block {
-                color: Color::ALICE_BLUE,
-                pos: (init_x.clone() - 1, init_y.clone() - 1),
-            },
-            sub2: Block {
-                color: Color::ALICE_BLUE,
-                pos: (init_x.clone() + 1, init_y.clone() - 1),
-            },
-            sub3: Block {
-                color: Color::ALICE_BLUE,
-                pos: (init_x.clone() + 2, init_y.clone() - 1),
-            },
-        });
-    }
-
-    fn new_o(init_x: isize, init_y: isize) -> Tetriminos {
-        return Tetriminos::O(Tetrimino {
-            /*
-               init(1) -> x
-               core -> c
-               sub -> 1~3
-
-               y: ?
-                  |
-                  0
-
-            x: 0123456789
-               xxxxOoxxxx
-                   x2
-                   c3
-               */
-            rotation: TetriminoRotate::UP,
-            core: Block {
-                color: Color::YELLOW,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub1: Block {
-                color: Color::YELLOW,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub2: Block {
-                color: Color::YELLOW,
-                pos: (init_x.clone() + 1, init_y.clone()),
-            },
-            sub3: Block {
-                color: Color::YELLOW,
-                pos: (init_x + 1, init_y - 1),
-            },
-        });
-    }
-
-    fn new_s(init_x: isize, init_y: isize) -> Tetriminos {
-        return Tetriminos::S(Tetrimino {
-            /*
-               init(sub1) -> x
-               core -> c
-               sub -> 1~3
-
-               y: ?
-                  |
-                  0
-
-            x: 0123456789
-               xxxxOoxxxx
-                   x2
-                  3c
-               */
-            rotation: TetriminoRotate::UP,
-            core: Block {
-                color: Color::GREEN,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub1: Block {
-                color: Color::GREEN,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub2: Block {
-                color: Color::GREEN,
-                pos: (init_x.clone() + 1, init_y.clone()),
-            },
-            sub3: Block {
-                color: Color::GREEN,
-                pos: (init_x.clone() - 1, init_y.clone() - 1),
-            },
-        });
-    }
-
-    fn new_z(init_x: isize, init_y: isize) -> Tetriminos {
-        return Tetriminos::Z(Tetrimino {
-            /*
-               init(2) -> x
-               core -> c
-               sub -> 1~3
-
-               y: ?
-                  |
-                  0
-
-            x: 0123456789
-               xxxxOoxxxx
-                  1x
-                   c3
-               */
-            rotation: TetriminoRotate::UP,
-            core: Block {
-                color: Color::RED,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub1: Block {
-                color: Color::RED,
-                pos: (init_x.clone() - 1, init_y.clone()),
-            },
-            sub2: Block {
-                color: Color::RED,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub3: Block {
-                color: Color::RED,
-                pos: (init_x.clone() + 1, init_y.clone() - 1),
-            },
-        });
-    }
-
-    fn new_j(init_x: isize, init_y: isize) -> Tetriminos {
-        return Tetriminos::J(Tetrimino {
-            /*
-               init -> x
-               core -> c
-               sub -> 1~3
-
-               y: ?
-                  |
-                  0
-
-            x: 0123456789
-               xxxxOoxxxx
-                  1x
-                  2c3
-               */
-            rotation: TetriminoRotate::UP,
-            core: Block {
-                color: Color::BLUE,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub1: Block {
-                color: Color::BLUE,
-                pos: (init_x.clone() - 1, init_y.clone()),
-            },
-            sub2: Block {
-                color: Color::BLUE,
-                pos: (init_x.clone() - 1, init_y.clone() - 1),
-            },
-            sub3: Block {
-                color: Color::BLUE,
-                pos: (init_x.clone() + 1, init_y.clone() - 1),
-            },
-        });
-    }
-
-    fn new_l(init_x: isize, init_y: isize) -> Tetriminos {
-        return Tetriminos::L(Tetrimino {
-            /*
-               init -> x
-               core -> c
-               sub -> 1~3
-
-               y: ?
-                  |
-                  0
-
-            x: 0123456789
-               xxxxOoxxxx
-                   x1
-                  2c3
-               */
-            rotation: TetriminoRotate::UP,
-            core: Block {
-                color: Color::ORANGE,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub1: Block {
-                color: Color::ORANGE,
-                pos: (init_x.clone() + 1, init_y.clone()),
-            },
-            sub2: Block {
-                color: Color::ORANGE,
-                pos: (init_x.clone() - 1, init_y.clone() - 1),
-            },
-            sub3: Block {
-                color: Color::ORANGE,
-                pos: (init_x.clone() + 1, init_y.clone() - 1),
-            },
-        });
-    }
-
-    fn new_t(init_x: isize, init_y: isize) -> Tetriminos {
-        return Tetriminos::T(Tetrimino {
-            /*
-               init(2) -> x
-               core -> c
-               sub -> 1~3
-
-               y: ?
-                  |
-                  0
-
-            x: 0123456789
-               xxxxOoxxxx
-                   x
-                  1c3
-               */
-            rotation: TetriminoRotate::UP,
-            core: Block {
-                color: Color::PURPLE,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub1: Block {
-                color: Color::PURPLE,
-                pos: (init_x.clone() - 1, init_y.clone() - 1),
-            },
-            sub2: Block {
-                color: Color::PURPLE,
-                pos: (init_x.clone(), init_y.clone()),
-            },
-            sub3: Block {
-                color: Color::PURPLE,
-                pos: (init_x.clone() + 1, init_y.clone() - 1),
-            },
-        });
-    }
-}
-
-*/
 
 struct FocusingTetrimino;
