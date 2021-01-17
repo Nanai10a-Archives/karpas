@@ -13,10 +13,11 @@ pub struct Karpas;
 
 impl Karpas {
     pub fn boot(self) -> Result<(), ()> {
+        // TODO: impl for AppBuilderの関数一発で設定をできるように分離しよう
         App::build()
             .add_plugins(DefaultPlugins)
             .init_resource::<ButtonMaterials>()
-            .add_resource(TextureServer {
+            .add_resource(TextureHandlerServer {
                 container: HashMap::new(),
             })
             .add_startup_system(load_texture.system())
@@ -79,7 +80,8 @@ fn setup(
     commands: &mut Commands,
     asset_server: Res<AssetServer>,
     button_materials: Res<ButtonMaterials>,
-    texture_server: Res<TextureServer>
+    texture_server: Res<TextureHandlerServer>,
+    mut color_materials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands
         .spawn(CameraUiBundle::default())
@@ -116,7 +118,10 @@ fn setup(
                 translation: Vec3::new(0.0, 0.0, 0.0),
                 ..Default::default()
             },
-            material: texture_server.container.get(&1i16).unwrap().clone(),
+            material: color_materials.add(ColorMaterial {
+                texture: Some(texture_server.container.get(&1i16).unwrap().clone()),
+                color: Color::DARK_GREEN,
+            }),
             ..Default::default()
         })
         .with(Mino);
@@ -131,6 +136,8 @@ fn moving(time: Res<Time>, mut query: Query<(&Mino, &mut Transform)>) {
 }
 
 fn window_setup(mut windows: ResMut<Windows>) {
+    // TODO: windowのアイコンを指定する
+    // TODO: windowのアスペクト比, 大きさを指定しましょう
     let window = windows.get_primary_mut().unwrap();
     window.set_vsync(true);
     window.set_title("Karpas, so yummy.".to_string());
@@ -138,16 +145,16 @@ fn window_setup(mut windows: ResMut<Windows>) {
 
 fn load_texture(
     asset_server: Res<AssetServer>,
-    mut texture_server: ResMut<TextureServer>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut handler_server: ResMut<TextureHandlerServer>,
+    mut textures: ResMut<Assets<Texture>>,
 ) {
+    // TODO: 何らかの方式(テキスト)でassetsを管理し, 管理ファイルから読み込もう
     [(1i16, "mino.png")].iter().for_each(|(num, path)| {
         let texture = asset_server.load(*path);
-        let color_material = materials.add(texture.into());
-        texture_server.container.insert(*num, color_material);
+        handler_server.container.insert(*num, texture);
     });
 }
 
-struct TextureServer {
-    container: HashMap<i16, Handle<ColorMaterial>>,
+struct TextureHandlerServer {
+    container: HashMap<i16, Handle<Texture>>,
 }
