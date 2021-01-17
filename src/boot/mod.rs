@@ -24,7 +24,7 @@ impl Karpas {
             .add_startup_system(setup.system())
             .add_startup_system(window_setup.system())
             .add_system(button_system.system())
-            .add_system(moving.system())
+            .add_system(movement_system.system())
             .run();
 
         return Ok(());
@@ -129,9 +129,41 @@ fn setup(
 
 struct Mino;
 
-fn moving(time: Res<Time>, mut query: Query<(&Mino, &mut Transform)>) {
+const MINO_SIZE: f32 = 32.0;
+
+fn movement_system(
+    time: Res<Time>,
+    mut query: Query<(&Mino, &mut Transform)>,
+    key_input: Res<Input<KeyCode>>,
+) {
     for (_, mut transform) in query.iter_mut() {
-        transform.translation.x = transform.translation.x + (time.delta_seconds() * 100.0)
+        let mut x_direction = 0.0;
+
+        if key_input.just_pressed(KeyCode::Left) {
+            x_direction -= MINO_SIZE;
+        }
+
+        if key_input.just_pressed(KeyCode::Right) {
+            x_direction += MINO_SIZE;
+        }
+
+        let mut y_direction =MINO_SIZE;
+
+        if key_input.just_pressed(KeyCode::Up) {
+            y_direction += MINO_SIZE;
+        }
+
+        if key_input.just_pressed(KeyCode::Down) {
+            y_direction -= 32.0;
+        }
+
+        let translation = &mut transform.translation;
+
+        translation.x += x_direction;
+        translation.y += y_direction;
+
+        // TODO: translation.x.min().max();
+        // TODO: translation.y.min().max();
     }
 }
 
