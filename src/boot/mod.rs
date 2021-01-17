@@ -123,8 +123,8 @@ fn setup(
                 color: Color::DARK_GREEN,
             }),
             ..Default::default()
-        });
-    // .with(Block);
+        })
+        .with(FocusingTetrimino);
 }
 
 #[derive(Bundle)]
@@ -138,7 +138,7 @@ const BLOCK_SIZE: f32 = 32.0;
 
 fn movement_system(
     time: Res<Time>,
-    mut query: Query<(&Block, &mut Transform)>,
+    mut query: Query<(&FocusingTetrimino, &mut Transform)>,
     key_input: Res<Input<KeyCode>>,
 ) {
     for (_, mut transform) in query.iter_mut() {
@@ -571,3 +571,5 @@ impl Tetriminos {
         });
     }
 }
+
+struct FocusingTetrimino;
