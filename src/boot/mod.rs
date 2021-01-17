@@ -171,20 +171,57 @@ fn ui_setup(
         .with_children(|parent| {
             parent.spawn(NodeBundle {
                 style: Style {
-                    size: Size::new(Val::Px(100.0), Val::Px(100.0)),
+                    size: Size::new(Val::Px(600.0), Val::Px(160.0)),
                     margin: Rect::all(Val::Px(100.0)),
+
+                    // 子要素群を縦横中央に配置する (copied
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
                     ..Default::default()
                 },
                 material: color_materials.add(Color::PURPLE.into()),
                 ..Default::default()
-            }).spawn(NodeBundle {
+            })
+                .with_children(|parent| {
+                    parent.spawn(TextBundle {
+                        text: Text {
+                            value: "Karpas".to_string(),
+                            font: asset_server.load("fonts.ttf"),
+                            style: TextStyle {
+                                font_size: 80.0,
+                                color: Color::VIOLET,
+                                ..Default::default()
+                            }
+                        },
+                        ..Default::default()
+                    });
+                }).spawn(ButtonBundle {
                 style: Style {
-                    size: Size::new(Val::Px(100.0), Val::Px(100.0)),
+                    size: Size::new(Val::Px(400.0), Val::Px(100.0)),
                     margin: Rect::all(Val::Px(100.0)),
+
+                    // 子要素群を縦横中央に配置する (copied
+                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Center,
                     ..Default::default()
                 },
+                material: button_materials.normal.clone(),
                 ..Default::default()
-            });
+            })
+                .with_children(|parent| {
+                    parent.spawn(TextBundle {
+                        text: Text {
+                            value: "what is this?".to_string(),
+                            font: asset_server.load("fonts.ttf"),
+                            style: TextStyle {
+                                font_size: 25.0,
+                                color: Color::WHITE,
+                                ..Default::default()
+                            }
+                        },
+                        ..Default::default()
+                    });
+                });
         });
 
 
