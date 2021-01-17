@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use std::collections::HashMap;
 
 pub struct KarpasBuilder;
 
@@ -15,6 +16,10 @@ impl Karpas {
         App::build()
             .add_plugins(DefaultPlugins)
             .init_resource::<ButtonMaterials>()
+            .add_resource(TextureServer {
+                container: HashMap::new(),
+            })
+            .add_startup_system(load_texture.system())
             .add_startup_system(setup.system())
             .add_startup_system(window_setup.system())
             .add_system(button_system.system())
@@ -74,7 +79,7 @@ fn setup(
     commands: &mut Commands,
     asset_server: Res<AssetServer>,
     button_materials: Res<ButtonMaterials>,
-    mut color_materials: ResMut<Assets<ColorMaterial>>,
+    texture_server: Res<TextureServer>
 ) {
     commands
         .spawn(CameraUiBundle::default())
@@ -111,7 +116,7 @@ fn setup(
                 translation: Vec3::new(0.0, 0.0, 0.0),
                 ..Default::default()
             },
-            material: color_materials.add(asset_server.load("mino.png").into()),
+            material: texture_server.container.get(&1i16).unwrap().clone(),
             ..Default::default()
         })
         .with(Mino);
@@ -129,4 +134,20 @@ fn window_setup(mut windows: ResMut<Windows>) {
     let window = windows.get_primary_mut().unwrap();
     window.set_vsync(true);
     window.set_title("Karpas, so yummy.".to_string());
+}
+
+fn load_texture(
+    asset_server: Res<AssetServer>,
+    mut texture_server: ResMut<TextureServer>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    [(1i16, "mino.png")].iter().for_each(|(num, path)| {
+        let texture = asset_server.load(*path);
+        let color_material = materials.add(texture.into());
+        texture_server.container.insert(*num, color_material);
+    });
+}
+
+struct TextureServer {
+    container: HashMap<i16, Handle<ColorMaterial>>,
 }
