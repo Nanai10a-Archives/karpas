@@ -222,7 +222,7 @@ fn movement_system(
         }
 
         if key_input.just_pressed(KeyCode::Down) {
-            y_direction -= 32.0;
+            y_direction -= BLOCK_SIZE;
         }
 
         let translation = &mut transform.translation;
