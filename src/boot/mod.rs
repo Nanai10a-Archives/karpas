@@ -127,11 +127,9 @@ fn setup(
         .with(FocusingTetrimino);
 }
 
-#[derive(Bundle)]
 struct Block {
     color: Color,
     pos: (isize, isize),
-    sprite: SpriteBundle,
 }
 
 const BLOCK_SIZE: f32 = 32.0;
@@ -198,7 +196,6 @@ struct TextureHandlerServer {
 
 #[derive(Bundle)]
 struct Tetrimino {
-    core_pos: (isize, isize),
     rotation: TetriminoRotate,
     core: Block,
     sub1: Block,
@@ -300,27 +297,22 @@ impl Tetriminos {
                    x
                   1o23
                */
-            core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
                 color: Color::ALICE_BLUE,
                 pos: (init_x.clone(), init_y.clone() - 1),
-                sprite: Default::default(),
             },
             sub1: Block {
                 color: Color::ALICE_BLUE,
                 pos: (init_x.clone() - 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
             sub2: Block {
                 color: Color::ALICE_BLUE,
                 pos: (init_x.clone() + 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
             sub3: Block {
                 color: Color::ALICE_BLUE,
                 pos: (init_x.clone() + 2, init_y.clone() - 1),
-                sprite: Default::default(),
             },
         });
     }
@@ -341,27 +333,22 @@ impl Tetriminos {
                    x2
                    c3
                */
-            core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
                 color: Color::YELLOW,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub1: Block {
                 color: Color::YELLOW,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub2: Block {
                 color: Color::YELLOW,
                 pos: (init_x.clone() + 1, init_y.clone()),
-                sprite: Default::default(),
             },
             sub3: Block {
                 color: Color::YELLOW,
                 pos: (init_x + 1, init_y - 1),
-                sprite: Default::default(),
             },
         });
     }
@@ -382,27 +369,22 @@ impl Tetriminos {
                    x2
                   3c
                */
-            core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
                 color: Color::GREEN,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub1: Block {
                 color: Color::GREEN,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub2: Block {
                 color: Color::GREEN,
                 pos: (init_x.clone() + 1, init_y.clone()),
-                sprite: Default::default(),
             },
             sub3: Block {
                 color: Color::GREEN,
                 pos: (init_x.clone() - 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
         });
     }
@@ -423,27 +405,22 @@ impl Tetriminos {
                   1x
                    c3
                */
-            core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
                 color: Color::RED,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub1: Block {
                 color: Color::RED,
                 pos: (init_x.clone() - 1, init_y.clone()),
-                sprite: Default::default(),
             },
             sub2: Block {
                 color: Color::RED,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub3: Block {
                 color: Color::RED,
                 pos: (init_x.clone() + 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
         });
     }
@@ -464,27 +441,22 @@ impl Tetriminos {
                   1x
                   2c3
                */
-            core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
                 color: Color::BLUE,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub1: Block {
                 color: Color::BLUE,
                 pos: (init_x.clone() - 1, init_y.clone()),
-                sprite: Default::default(),
             },
             sub2: Block {
                 color: Color::BLUE,
                 pos: (init_x.clone() - 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
             sub3: Block {
                 color: Color::BLUE,
                 pos: (init_x.clone() + 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
         });
     }
@@ -505,27 +477,22 @@ impl Tetriminos {
                    x1
                   2c3
                */
-            core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
                 color: Color::ORANGE,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub1: Block {
                 color: Color::ORANGE,
                 pos: (init_x.clone() + 1, init_y.clone()),
-                sprite: Default::default(),
             },
             sub2: Block {
                 color: Color::ORANGE,
                 pos: (init_x.clone() - 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
             sub3: Block {
                 color: Color::ORANGE,
                 pos: (init_x.clone() + 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
         });
     }
@@ -546,27 +513,22 @@ impl Tetriminos {
                    x
                   1c3
                */
-            core_pos: (init_x.clone(), init_y.clone() - 1),
             rotation: TetriminoRotate::UP,
             core: Block {
                 color: Color::PURPLE,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub1: Block {
                 color: Color::PURPLE,
                 pos: (init_x.clone() - 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
             sub2: Block {
                 color: Color::PURPLE,
                 pos: (init_x.clone(), init_y.clone()),
-                sprite: Default::default(),
             },
             sub3: Block {
                 color: Color::PURPLE,
                 pos: (init_x.clone() + 1, init_y.clone() - 1),
-                sprite: Default::default(),
             },
         });
     }
