@@ -1,5 +1,6 @@
-use bevy::prelude::*;
 use std::collections::HashMap;
+
+use bevy::prelude::*;
 
 pub struct KarpasBuilder;
 
@@ -52,12 +53,14 @@ impl FromResources for ButtonMaterials {
 }
 
 fn start_button_system(
+    commands: &mut Commands,
     button_materials: Res<ButtonMaterials>,
     mut interaction_query: Query<
-        (&Interaction, &mut Handle<ColorMaterial>, &Children),
+        (&Interaction, &mut Handle<ColorMaterial>, &mut Children),
         (Mutated<Interaction>, With<Button>),
     >,
     mut text_query: Query<&mut Text>,
+    mut to_action_query: Query<(&TitleUIEntity, Entity)>,
 ) {
     for (interaction, mut material, children) in interaction_query.iter_mut() {
         let mut text = text_query.get_mut(children[0]).unwrap();
@@ -66,6 +69,10 @@ fn start_button_system(
             Interaction::Clicked => {
                 text.value = "! Start !".to_string().into();
                 *material = button_materials.pressed.clone();
+
+                for (_, entity) in to_action_query.iter_mut() {
+                    commands.despawn(entity);
+                }
             }
             Interaction::Hovered => {
                 text.value = "are you Ready?".to_string().into();
@@ -141,6 +148,8 @@ fn wall_setup(
     });
 }
 
+struct TitleUIEntity;
+
 fn ui_setup(
     commands: &mut Commands,
     asset_server: Res<AssetServer>,
@@ -172,6 +181,7 @@ fn ui_setup(
             parent.spawn(NodeBundle {
                 style: Style {
                     size: Size::new(Val::Px(600.0), Val::Px(160.0)),
+                    flex_shrink: 0.0,
                     margin: Rect::all(Val::Px(100.0)),
 
                     // 子要素群を縦横中央に配置する (copied
@@ -191,13 +201,14 @@ fn ui_setup(
                                 font_size: 80.0,
                                 color: Color::VIOLET,
                                 ..Default::default()
-                            }
+                            },
                         },
                         ..Default::default()
-                    });
-                }).spawn(ButtonBundle {
+                    }).with(TitleUIEntity);
+                }).with(TitleUIEntity).spawn(ButtonBundle {
                 style: Style {
                     size: Size::new(Val::Px(400.0), Val::Px(100.0)),
+                    flex_shrink: 0.0,
                     margin: Rect::all(Val::Px(100.0)),
 
                     // 子要素群を縦横中央に配置する (copied
@@ -217,13 +228,12 @@ fn ui_setup(
                                 font_size: 25.0,
                                 color: Color::WHITE,
                                 ..Default::default()
-                            }
+                            },
                         },
                         ..Default::default()
-                    });
-                });
-        });
-
+                    }).with(TitleUIEntity);
+                }).with(TitleUIEntity);
+        }).with(TitleUIEntity);
 
 
     commands
@@ -234,12 +244,11 @@ fn ui_setup(
                 ..Default::default()
             },
             material: color_materials.add(ColorMaterial {
-                texture: Some(texture_server.container.get(&1i16).unwrap().clone()),
+                texture: Some(texture_server.container.get(&1i16).unwrap().clone().into()),
                 color: Color::DARK_GREEN,
             }),
             ..Default::default()
-        })
-        .with(FocusingTetrimino);
+        }).with(FocusingTetrimino);
 }
 
 #[derive(Clone)]
