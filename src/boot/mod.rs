@@ -159,82 +159,91 @@ fn ui_setup(
 ) {
     commands.spawn(CameraUiBundle::default());
 
-    commands.spawn(NodeBundle {
-        style: Style {
-            // 自身を中央に配置する
-            size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
-            position_type: PositionType::Absolute,
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                // 自身を中央に配置する
+                size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                position_type: PositionType::Absolute,
 
-            // 子要素群を縦横中央に配置する
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
+                // 子要素群を縦横中央に配置する
+                align_items: AlignItems::Center,
+                justify_content: JustifyContent::Center,
 
-            // 子要素(Flex)を順にy軸負の方向から並べていく
-            // Tips: x軸はブラウザとは変わらないがy軸は下向きが正の向きだぞ!
-            flex_direction: FlexDirection::ColumnReverse,
+                // 子要素(Flex)を順にy軸負の方向から並べていく
+                // Tips: x軸はブラウザとは変わらないがy軸は下向きが正の向きだぞ!
+                flex_direction: FlexDirection::ColumnReverse,
+                ..Default::default()
+            },
+            material: color_materials.add(Color::CYAN.into()),
             ..Default::default()
-        },
-        material: color_materials.add(Color::CYAN.into()),
-        ..Default::default()
-    })
+        })
         .with_children(|parent| {
-            parent.spawn(NodeBundle {
-                style: Style {
-                    size: Size::new(Val::Px(600.0), Val::Px(160.0)),
-                    flex_shrink: 0.0,
-                    margin: Rect::all(Val::Px(100.0)),
+            parent
+                .spawn(NodeBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(600.0), Val::Px(160.0)),
+                        flex_shrink: 0.0,
+                        margin: Rect::all(Val::Px(100.0)),
 
-                    // 子要素群を縦横中央に配置する (copied
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    ..Default::default()
-                },
-                material: color_materials.add(Color::PURPLE.into()),
-                ..Default::default()
-            })
-                .with_children(|parent| {
-                    parent.spawn(TextBundle {
-                        text: Text {
-                            value: "Karpas".to_string(),
-                            font: asset_server.load("fonts.ttf"),
-                            style: TextStyle {
-                                font_size: 80.0,
-                                color: Color::VIOLET,
-                                ..Default::default()
-                            },
-                        },
+                        // 子要素群を縦横中央に配置する (copied
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
                         ..Default::default()
-                    }).with(TitleUIEntity);
-                }).with(TitleUIEntity).spawn(ButtonBundle {
-                style: Style {
-                    size: Size::new(Val::Px(400.0), Val::Px(100.0)),
-                    flex_shrink: 0.0,
-                    margin: Rect::all(Val::Px(100.0)),
-
-                    // 子要素群を縦横中央に配置する (copied
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
+                    },
+                    material: color_materials.add(Color::PURPLE.into()),
                     ..Default::default()
-                },
-                material: button_materials.normal.clone(),
-                ..Default::default()
-            })
+                })
                 .with_children(|parent| {
-                    parent.spawn(TextBundle {
-                        text: Text {
-                            value: "what is this?".to_string(),
-                            font: asset_server.load("fonts.ttf"),
-                            style: TextStyle {
-                                font_size: 25.0,
-                                color: Color::WHITE,
-                                ..Default::default()
+                    parent
+                        .spawn(TextBundle {
+                            text: Text {
+                                value: "Karpas".to_string(),
+                                font: asset_server.load("fonts.ttf"),
+                                style: TextStyle {
+                                    font_size: 80.0,
+                                    color: Color::VIOLET,
+                                    ..Default::default()
+                                },
                             },
-                        },
-                        ..Default::default()
-                    }).with(TitleUIEntity);
-                }).with(TitleUIEntity);
-        }).with(TitleUIEntity);
+                            ..Default::default()
+                        })
+                        .with(TitleUIEntity);
+                })
+                .with(TitleUIEntity)
+                .spawn(ButtonBundle {
+                    style: Style {
+                        size: Size::new(Val::Px(400.0), Val::Px(100.0)),
+                        flex_shrink: 0.0,
+                        margin: Rect::all(Val::Px(100.0)),
 
+                        // 子要素群を縦横中央に配置する (copied
+                        align_items: AlignItems::Center,
+                        justify_content: JustifyContent::Center,
+                        ..Default::default()
+                    },
+                    material: button_materials.normal.clone(),
+                    ..Default::default()
+                })
+                .with_children(|parent| {
+                    parent
+                        .spawn(TextBundle {
+                            text: Text {
+                                value: "what is this?".to_string(),
+                                font: asset_server.load("fonts.ttf"),
+                                style: TextStyle {
+                                    font_size: 25.0,
+                                    color: Color::WHITE,
+                                    ..Default::default()
+                                },
+                            },
+                            ..Default::default()
+                        })
+                        .with(TitleUIEntity);
+                })
+                .with(TitleUIEntity);
+        })
+        .with(TitleUIEntity);
 
     commands
         .spawn(Camera2dBundle::default())
@@ -248,7 +257,8 @@ fn ui_setup(
                 color: Color::DARK_GREEN,
             }),
             ..Default::default()
-        }).with(FocusingTetrimino);
+        })
+        .with(FocusingTetrimino);
 }
 
 #[derive(Clone)]
