@@ -1,6 +1,6 @@
-pub struct LocalHistory{}
-pub struct LocalFuture{}
-pub struct Block{}
+pub struct LocalHistory {}
+pub struct LocalFuture {}
+pub struct Block {}
 pub enum BlockPattern {}
 pub enum TetriminoType {}
 pub enum Direction {}
